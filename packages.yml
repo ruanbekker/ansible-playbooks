@@ -1,0 +1,13 @@
+---
+# Install Packages using the APT Package Manager
+- hosts: all
+  tasks:
+  - name: Install Packages
+    apt: name={{ item }} state=latest update_cache=yes
+    with_items:
+      - ntp
+      - python
+      - tcpdump
+      - wget
+      - openssl
+      - curl
