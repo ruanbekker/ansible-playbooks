@@ -1,0 +1,14 @@
+---
+# Echo Variable
+# Echo Static Stromg
+- hosts: admin
+  tasks:
+  - name: echo variable value
+    shell: /bin/echo "{{ location_city }}"
+    register: echo
+  - debug: msg="{{echo.stdout}}"
+
+  - name: echo static value
+    shell: /bin/echo hello world
+    register: echo_static
+  - debug: msg="{{echo_static.stdout}}"
