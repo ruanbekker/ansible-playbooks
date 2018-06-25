@@ -1,6 +1,6 @@
 ---
 # Install Packages using the APT Package Manager
-- hosts: all
+- hosts: glusterfs
   tasks:
   - name: Install Packages
     apt: name={{ item }} state=latest update_cache=yes
@@ -11,3 +11,7 @@
       - wget
       - openssl
       - curl
+      - glusterfs-server 
+      - glusterfs-client 
+      - glusterfs-common 
+      - nfs-kernel-server
