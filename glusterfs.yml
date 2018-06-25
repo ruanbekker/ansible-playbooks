@@ -1,0 +1,66 @@
+---
+- hosts: glusterfs
+  tasks:
+  - name: Install GlusterFS
+    apt: name={{ item }} state=latest update_cache=yes
+    with_items:
+      - glusterfs-server 
+      - glusterfs-client 
+      - glusterfs-common 
+      - nfs-kernel-server
+
+  - name: Enable GlusterFS on Boot
+    service: "name={{ glusterfs_daemon }} state=started enabled=yes"
+
+  - name: Probe GlusterFS Nodes
+    shell: "gluster peer probe {{ item }}"
+    with_items: 
+      - "glusterfs-node-1"
+      - "glusterfs-node-2"
+
+  - name: Create Brick Directories
+    file: path=/bricks/1 state=directory
+
+- hosts: glusterfs-node-1
+  tasks:
+  - name: Create GlusterFS Volume
+    shell: gluster volume create dockervol replica 2 transport tcp glusterfs-node-1:/bricks/1 glusterfs-node-2:/bricks/1 force
+    register: gluster_create
+  - debug: msg="{{gluster_create.stdout}}"
+
+  - name: Start GlusterFS Volume
+    shell: gluster volume start dockervol
+    register: gluster_start
+  - debug: msg="{{gluster_start.stdout}}"
+
+- hosts: glusterfs
+  tasks:
+  - name: fstab configuration
+#    shell: sudo su -c 'echo "localhost:/dockervol /mnt glusterfs defaults,_netdev,backupvolfile-server=$(hostname) 0 0" >> /etc/fstab'
+#    register: fstab
+#  - debug: msg="{{fstab.stdout}}"
+    mount:
+      path: /mnt
+      src: localhost:/dockervol
+      fstype: glusterfs
+      opts: "defaults,_netdev,backupvolfile-server={{ inventory_hostname }}"
+      dump: 0
+      passno: 0
+      state: present
+    register: mount_output
+  - debug: msg="{{mount_output}}"
+
+  - name: remount
+    shell: mount -a
+    args:
+      warn: false
+
+  - name: directory permissions
+    file:
+      path: "/mnt"
+      state: directory
+      owner: ruan
+      group: ruan
+      mode: 0750
+      recurse: yes
+    become: yes
