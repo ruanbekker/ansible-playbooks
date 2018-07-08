@@ -1,17 +1,15 @@
-# ansible-playbooks
+# Deploy Elasticsearch Cluster
 
-Repo for Anisble Playbooks
+Deploy Elasticsearch 2 Node Cluster with Ansible
 
-## Examples:
+## Bootstrap Nodes with Python
 
-Test:
-
-```
-$ ansible -i inventory.ini -u root -m ping all
+```bash
+$ ansible-playbook -i inventory.ini -u root tasks/bootstrap-python.yml
 ```
 
-Bootstrap Nodes with Python:
+## Deploy Elasticsearch:
 
-```
-$ ansible-playbook -i inventory.ini -u root bootstrap-python.yml
+```bash
+$ ansible-playbook -i inventory.ini -u root tasks/deploy-elasticsearch-cluster.yml
 ```

@@ -3,22 +3,20 @@
 # Setup Passwordless SSH from Jumpbox
 # Install Packages using APT
 - name: setup pre-requisites
-  hosts: new
+  hosts: elasticsearch
   roles:
     - create-sudo-user
     - install-modules
     - configure-hosts-file
 
-- name: setup ruan user on the nodes
-  become: yes
-  become_user: ruan
-  hosts: admin
-  roles:
-    - configure-admin
-
 - name: copy public key to nodes
   become: yes
   become_user: ruan
-  hosts: new
+  hosts: elasticsearch
   roles:
     - copy-keys
+
+- name: install elasticsearch
+  hosts: elasticsearch
+  roles:
+    - elasticsearch
