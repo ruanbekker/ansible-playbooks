@@ -1,0 +1,41 @@
+Host docker-node-1
+  Hostname 10.0.0.2
+  User ruan
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
+Host docker-node-2
+  Hostname 10.0.0.3
+  User ruan
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
+Host docker-node-3
+  Hostname 10.0.0.3
+  User ruan
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
+Host glusterfs-node-1
+  Hostname 10.0.0.4
+  User ruan
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
+Host glusterfs-node-2
+  Hostname 10.0.0.5
+  User ruan
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
+Host elasticsearch-node-1
+  Hostname 10.0.0.6
+  User ruan
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
+Host elasticsearch-node-2
+  Hostname 10.0.0.7
+  User ruan
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null

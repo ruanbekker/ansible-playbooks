@@ -1,0 +1,4 @@
+{% for host in nfs_hosts %}
+/vol "{{ hostvars[host].ansible_default_ipv4.address }}"(rw,sync,no_subtree_check)
+{% endfor %}
+
