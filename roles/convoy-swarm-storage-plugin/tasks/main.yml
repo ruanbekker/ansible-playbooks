@@ -13,18 +13,9 @@
     group: nogroup
     state: directory
 
-#- name: copy 
-#  copy:
-#    src: exports.j2
-#    dest: /etc/exports
-#    owner: root
-#    group: root
-#    mode: 0644
-
 - name: configure nfs exports
   vars: 
     nfs_hosts: "{{ groups['docker-nodes']  }}" 
-#  tasks:
   template:
     src: exports.j2
     dest: /etc/exports
@@ -47,8 +38,6 @@
     dump: 0
     passno: 0
     state: present
-#  register: mount_output
-#- debug: msg="{{mount_output}}"
 
 - name: remount
   shell: mount -a
