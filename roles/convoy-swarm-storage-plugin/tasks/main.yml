@@ -1,0 +1,122 @@
+---
+- name: install nfs server and client
+  apt: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - nfs-kernel-server
+    - nfs-common
+  tags: convoy
+
+- name: create convoy base directory
+  file: 
+    path: /vol
+    owner: nobody
+    group: nogroup
+    state: directory
+
+#- name: copy 
+#  copy:
+#    src: exports.j2
+#    dest: /etc/exports
+#    owner: root
+#    group: root
+#    mode: 0644
+
+- name: configure nfs exports
+  vars: 
+    nfs_hosts: "{{ groups['docker-nodes']  }}" 
+#  tasks:
+  template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+
+- name: enable nfs on boot and restart the service
+  service: 
+    name: nfs-kernel-server 
+    state: restarted 
+    enabled: yes
+
+- name: fstab configuration
+  mount:
+    path: /mnt
+    src: "{{ hostvars['docker-node-1']['ansible_default_ipv4']['address'] }}:/vol"
+    fstype: nfs
+    opts: "auto,nofail,noatime,nolock,intr,tcp,actimeo=1800"
+    dump: 0
+    passno: 0
+    state: present
+#  register: mount_output
+#- debug: msg="{{mount_output}}"
+
+- name: remount
+  shell: mount -a
+  args:
+    warn: false
+
+- name: download convoy
+  get_url:
+    url: https://github.com/rancher/convoy/releases/download/v0.5.0/convoy.tar.gz
+    dest: /tmp/convoy.tar.gz
+    mode: 0644
+
+- name: untar archive
+  unarchive:
+    src: /tmp/convoy.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: copy convoy binaries
+  copy:
+    src: /tmp/convoy/convoy
+    dest: /usr/local/bin/
+    remote_src: yes
+    owner: root
+    group: root
+    mode: "a+x"
+
+- name: copy convoy pdata tools
+  copy:
+    src: /tmp/convoy/convoy-pdata_tools
+    dest: /usr/local/bin/
+    remote_src: yes
+    owner: root
+    group: root
+    mode: "a+x"
+
+- name: Remove old files
+  file: 
+    path: /tmp/convoy.tar.gz 
+    state: absent
+
+- name: create docker-plugins directory
+  file:
+    path: /etc/docker/plugins
+    owner: root
+    group: docker
+    state: directory
+
+- name: copy convoy.spec
+  copy:
+    src: convoy.spec
+    dest: /etc/docker/plugins/convoy.spec
+    owner: root
+    group: docker
+    mode: 0644
+
+- name: copy convoy init script
+  copy:
+    src: convoy
+    dest: /etc/init.d/convoy
+    owner: root
+    group: root
+    mode: "a+x"
+
+- name: reload configs and start convoy
+  systemd:
+    daemon_reload: yes
+    name: convoy
+    enabled: yes
+    state: restarted
+

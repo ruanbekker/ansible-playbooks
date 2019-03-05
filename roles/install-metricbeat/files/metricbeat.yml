@@ -1,0 +1,37 @@
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+#name:
+tags: ["service-X", "web-tier"]
+
+fields:
+  env: production
+
+#setup.dashboards.enabled: false
+#setup.dashboards.url:
+
+#setup.kibana:
+#  host: ""
+
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+
+#output.logstash:
+  #hosts: ["localhost:5044"]
+
+#logging.level: debug
+#logging.selectors: ["*"]
+
+#xpack.monitoring.enabled: false
+#xpack.monitoring.elasticsearch:

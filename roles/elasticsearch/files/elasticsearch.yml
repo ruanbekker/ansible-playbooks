@@ -1,0 +1,8 @@
+cluster.name: my-es-cluster-nh5qhyxn
+#node.name: node-1
+path.data: /var/lib/elasticsearch
+path.logs: /var/log/elasticsearch
+network.host: 0.0.0.0
+http.port: 9200
+# todo: change to variables
+discovery.zen.ping.unicast.hosts: ["10.0.2.10", "10.0.2.11"]

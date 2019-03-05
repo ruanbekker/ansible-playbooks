@@ -1,5 +1,5 @@
 ---
-- name: Copy Publick Key to Other Hosts
+- name: Copy Public Key to Other Hosts
   become: true
   become_user: ruan
   copy:

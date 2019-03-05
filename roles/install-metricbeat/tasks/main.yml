@@ -1,0 +1,30 @@
+---
+- name: get metricbeat package
+  get_url:
+    url: https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-6.3.0-amd64.deb
+    dest: /tmp/metricbeat-6.3.0-amd64.deb
+
+- name: install metricbeat
+  apt:
+    deb: /tmp/metricbeat-6.3.0-amd64.deb
+
+- name: configure metricbeat main config
+  copy:
+    src: metricbeat.yml
+    dest: /etc/metricbeat/metricbeat.yml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: enable system module in metricbeat
+  shell: metricbeat modules enable system
+  args:
+    executable: /bin/bash
+
+- name: load kibana dashboards
+  shell: metricbeat setup
+  args:
+    executable: /bin/bash
+
+- name: ensure metricbeat is running
+  systemd: state=restarted name=metricbeat enabled=yes

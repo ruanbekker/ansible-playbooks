@@ -1,0 +1,41 @@
+---
+- name: setup pre-requisites
+  hosts: docker-nodes
+  roles:
+    - create-sudo-user
+    - install-modules
+    - configure-hosts-file
+
+- name: setup user on the nodes
+  become: yes
+  become_user: ruan
+  hosts: docker-nodes
+  roles:
+    - configure-admin
+
+- name: copy public key to nodes
+  become: yes
+  become_user: ruan
+  hosts: docker-nodes
+  roles:
+    - copy-keys
+
+- name: install docker
+  hosts: docker-nodes
+  roles:
+    - docker-installation
+
+- name: initialize docker swarm
+  hosts: swarm-manager
+  roles:
+    - docker-swarm-init
+
+- name: add workers to the swarm
+  hosts: docker-nodes
+  roles:
+    - docker-swarm-add-manager
+
+- name: install convoy storage nfs plugin
+  hosts: docker-nodes
+  roles:
+    - convoy-swarm-storage-plugin

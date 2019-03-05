@@ -2,33 +2,21 @@
 # Provisions User on Nodes
 # Setup Passwordless SSH from Jumpbox
 # Install Packages using APT
-- name: bootstrap python
-  hosts: newes
-  roles:
-    - bootstrap-python
-
 - name: setup pre-requisites
-  hosts: newes
+  hosts: elasticsearch
   roles:
     - create-sudo-user
     - install-modules
     - configure-hosts-file
 
-#- name: setup ruan user on the nodes
-#  become: yes
-#  become_user: ruan
-#  hosts: admin
-#  roles:
-#    - configure-admin
-
 - name: copy public key to nodes
   become: yes
   become_user: ruan
-  hosts: newes
+  hosts: elasticsearch
   roles:
     - copy-keys
 
 - name: install elasticsearch
-  hosts: newes
+  hosts: elasticsearch
   roles:
     - elasticsearch

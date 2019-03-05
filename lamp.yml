@@ -1,0 +1,25 @@
+---
+# Setup LAMP Stack
+- hosts: newhost
+  tasks:
+    - name: install lamp stack
+      sudo: yes
+      apt: name={{ item }} state=present update_cache=yes
+      with_items:
+        - apache2
+        - mysql-server
+        - php7.0
+        - php7.0-mysql
+
+    - name: start services
+      service: name={{ item }} state=started enabled=yes
+      sudo: yes
+      with_items:
+        - apache2
+        - mysql
+
+    - name: deploy index.html
+      sudo: yes
+      copy: 
+        src: /tmp/index.html 
+        dest: /var/www/html/index.html

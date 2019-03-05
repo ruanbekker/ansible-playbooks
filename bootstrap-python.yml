@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: docker-nodes
   gather_facts: False
   
   tasks:

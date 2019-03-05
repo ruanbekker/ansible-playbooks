@@ -1,0 +1,29 @@
+---
+- stat:
+    path: /usr/bin/metricbeat
+  register: sym
+
+- fail:
+    msg: "metricbeat is not installed"
+  when: sym.stat.islnk is not defined
+
+- name: enable docker module in metricbeat
+  shell: metricbeat modules enable docker
+  args:
+    executable: /bin/bash
+
+- name: configure metricbeat docker module config
+  copy:
+    src: docker.yml
+    dest: /etc/metricbeat/modules.d/docker.yml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: load kibana dashboards
+  shell: metricbeat setup
+  args:
+    executable: /bin/bash
+
+- name: ensure metricbeat is running
+  systemd: state=restarted name=metricbeat enabled=yes

@@ -1,0 +1,1 @@
+/vol {{ hostvars['docker-node-1']['ansible_default_ipv4']['address'] }}(rw,sync,no_subtree_check) {{ hostvars['docker-node-2']['ansible_default_ipv4']['address'] }}(rw,sync,no_subtree_check) {{ hostvars['docker-node-3']['ansible_default_ipv4']['address'] }}(rw,sync,no_subtree_check)

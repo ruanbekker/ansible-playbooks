@@ -1,0 +1,6 @@
+---
+- name: setup metricbeat-docker
+  hosts: docker-node-3
+  roles:
+    - install-metricbeat
+    - setup-metricbeat-docker

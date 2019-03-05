@@ -23,6 +23,14 @@
     state: present
     update_cache: yes
 
+- name: apply elasticsearch config
+  copy:
+    src: elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: root
+    group: elasticsearch
+    mode: 0644
+
 - name: reload systemd config
   systemd: daemon_reload=yes
 
