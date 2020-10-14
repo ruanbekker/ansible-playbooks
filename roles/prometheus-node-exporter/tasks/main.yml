@@ -1,0 +1,67 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html
+- name: create download directory
+  file:
+    path: /tmp/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+- name: create etc /etc/prometheus directory
+  file:
+    path: /etc/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+- name: create /var/lib/prometheus directory
+  file:
+    path: /var/lib/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html
+- name: download node exporter
+  environment:
+    NODE_EXPORTER_VERSION: "1.0.1"
+  unarchive:
+    src: https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz
+    dest: /tmp/prometheus
+    extra_opts: ['--strip-components=1', '--show-stored-names']
+    remote_src: yes
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+- name: copy node-exporter binary
+  environment:
+    NODE_EXPORTER_VERSION: "1.0.1"
+  copy:
+    src: /tmp/prometheus/node_exporter
+    dest: /usr/local/bin/node_exporter
+    owner: prometheus
+    group: prometheus
+    mode: a+x
+    remote_src: yes
+
+- name: copy node-exporter systemd unit
+  copy:
+    src: node-exporter/node_exporter.service
+    dest: /etc/systemd/system/node_exporter.service
+    owner: root
+    group: root
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
+- name: enable and start node exporter
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+    name: node_exporter
+
+- name: cleanup download directory
+  file:
+    path: /tmp/prometheus
+    state: absent
