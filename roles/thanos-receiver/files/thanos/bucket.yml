@@ -1,0 +1,9 @@
+# get a way to use env vars
+type: S3
+config:
+  bucket: ${S3_BUCKET}
+  endpoint: ${S3_ENDPOINT}
+  insecure: false
+  signature_version2: true
+  access_key: ${S3_ACCESS_KEY}
+  secret_key: ${S3_SECRET_KEY}
