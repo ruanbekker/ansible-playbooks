@@ -1,0 +1,73 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html
+- name: create download directory
+  file:
+    path: /tmp/thanos
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+- name: create etc /var/lib/thanos/data/store directory
+  file:
+    path: /var/lib/thanos/data/store
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+- name: create /var/lib/thanos/config directory
+  file:
+    path: /var/lib/thanos/config
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html
+- name: download thanos
+  environment:
+    THANOS_VERSION: "0.15.0"
+  unarchive:
+    src: https://github.com/thanos-io/thanos/releases/download/v${THANOS_VERSION}/thanos-${THANOS_VERSION}.linux-amd64.tar.gz
+    dest: /tmp/thanos
+    extra_opts: ['--strip-components=1', '--show-stored-names']
+    remote_src: yes
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+- name: copy thanos binary
+  copy:
+    src: /tmp/thanos/thanos
+    dest: /usr/local/bin/thanos
+    owner: prometheus
+    group: prometheus
+    mode: a+x
+    remote_src: yes
+
+- name: copy thanos bucket config to host
+  copy:
+    src: thanos/bucket.yml
+    dest: /var/lib/thanos/config/bucket.yml
+    owner: prometheus
+    group: prometheus
+    mode: '0644'
+
+- name: copy thanos receive systemd unit
+  copy:
+    src: thanos/thanos_receive.service
+    dest: /etc/systemd/system/thanos_receive.service
+    owner: root
+    group: root
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
+- name: enable and start thanos receive
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+    name: thanos_receive
+
+- name: cleanup download directory
+  file:
+    path: /tmp/thanos
+    state: absent
