@@ -1,0 +1,29 @@
+[Unit]
+Description=Thanos-Receive
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/local/bin/thanos \
+    receive \
+      --debug.name="receive" \
+      --log.level="info" \
+      --tsdb.path="/var/lib/thanos/data/store" \
+      --grpc-address"=0.0.0.0:10901" \
+      --grpc-grace-period="1s" \
+      --http-address="0.0.0.0:10902" \
+      --http-grace-period="1s"
+      --label=receive="true" \
+      --objstore.config-file="/var/lib/thanos/config/bucket.yml"
+      --remote-write.address="0.0.0.0:19291"
+
+[Install]
+WantedBy=multi-user.target
