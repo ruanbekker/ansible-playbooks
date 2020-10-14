@@ -1,0 +1,16 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_module.html
+# https://docs.ansible.com/ansible/2.5/modules/user_module.html
+- name: ensure prometheus group exists
+  group:
+    name: prometheus
+    state: present
+
+- name: ensure prometheus user exists
+  user:
+    name: prometheus
+    group: prometheus
+    comment: Prometheus
+    shell: /bin/false
+    generate_ssh_key: no
+    state: present
