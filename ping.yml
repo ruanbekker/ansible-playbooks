@@ -1,0 +1,4 @@
+- name: Test Ping
+  hosts: rpi-fleet
+  tasks:
+  - action: ping
