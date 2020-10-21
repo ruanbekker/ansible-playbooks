@@ -1,0 +1,5 @@
+---
+- name: ping raspberry pi fleet
+  hosts: rpifleet
+  roles:
+    - { role: ../roles/ping }
