@@ -11,7 +11,7 @@ Group=prometheus
 Type=simple
 Restart=on-failure
 RestartSec=5s
-ExecStart=/usr/local/bin/node_exporter
+ExecStart=/usr/bin/node_exporter
 
 [Install]
 WantedBy=multi-user.target
