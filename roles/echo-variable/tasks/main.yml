@@ -1,0 +1,5 @@
+---
+- include_vars: ./vars/main.yml
+- name: return variable to stdout
+  ansible.builtin.debug:
+    msg: The color is {{ color }}
