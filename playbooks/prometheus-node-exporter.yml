@@ -1,0 +1,8 @@
+---
+- name: install node exporter
+  hosts: target
+  become: yes
+  become_user: root
+  roles:
+    - { role: ../roles/create-prometheus-user }
+    - { role: ../roles/prometheus-node-exporter }
