@@ -1,11 +1,15 @@
 ---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html
 - name: Install Packages
-  apt: name={{ item }} state=latest update_cache=yes
-  with_items:
+  apt:
+    pkg:
     - apt-transport-https
     - ntp
-    - python
+    - python3
     - tcpdump
     - wget
     - openssl
     - curl
+    state: latest
+    update_cache: yes
+    autoremove: yes
