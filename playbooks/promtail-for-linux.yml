@@ -1,0 +1,7 @@
+---
+- name: deploys-promtail
+  hosts: promtail_group
+  become: yes
+  become_user: root
+  roles:
+    - { role: ../roles/promtail-for-linux }

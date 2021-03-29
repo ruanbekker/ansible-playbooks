@@ -1,0 +1,70 @@
+---
+# references:
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
+# https://medium.com/@kanrangsan/ansible-template-out-of-the-box-3749604ee4fa
+
+- include_vars: ./vars/main.yml
+- name: create /etc/promtail directory
+  file:
+    path: /etc/promtail
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: create /var/lib/promtail directory
+  file:
+    path: /var/lib/promtail
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: create /opt/promtail directory
+  file:
+    path: "/opt/promtail/{{ promtail_version }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: download promtail
+  ansible.builtin.unarchive:
+    src: "https://github.com/grafana/loki/releases/download/v{{ promtail_version }}/promtail-linux-amd64.zip"
+    dest: "/opt/promtail/{{ promtail_version }}"
+    extra_opts: '-j'
+    remote_src: yes
+
+- name: copy promtail binary
+  copy:
+    src: "/opt/promtail/{{ promtail_version }}/promtail-linux-amd64"
+    dest: /usr/bin/promtail
+    owner: root
+    group: root
+    mode: a+x
+    remote_src: yes
+
+- name: copy promtail systemd unit
+  copy:
+    src: promtail.service
+    dest: /etc/systemd/system/promtail.service
+    owner: root
+    group: root
+
+- name: generate config from template
+  template:
+    src: promtail-config.yml.j2
+    dest: /etc/promtail/promtail-config.yml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: enable and start promtail
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+    name: promtail

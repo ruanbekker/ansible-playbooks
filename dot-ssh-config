@@ -1,0 +1,26 @@
+# Globals
+Host *
+    Port 22
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    ServerAliveInterval 60
+    ServerAliveCountMax 30
+
+# Bastions / Jump Hosts
+Host jump-host
+    HostName jump-host.mydomain.com
+    Port 22
+    User ubuntu
+    IdentityFile ~/.ssh/id_rsa
+
+# SSH Targets
+Host promtail-host-1
+    HostName example-host.mydomain.com
+    User ubuntu
+    IdentityFile ~/.ssh/target.pem
+    ProxyJump jump-host
+
+Host host-with-same-key
+    HostName host-with-same-key.mydomain.com
+    User ec2-user
+    ProxyCommand ssh -q -W %h:%p jump-host

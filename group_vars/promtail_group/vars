@@ -1,0 +1,6 @@
+promtail_version: "2.2.0"
+environment_name: "dev"
+service_name: "nginx"
+loki_username: "loki"
+loki_password: "{{ vault_loki_password }}"
+loki_hostname: "loki-dev.mydomain.com"
