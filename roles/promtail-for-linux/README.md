@@ -2,6 +2,10 @@
 
 Deploys promtail for linux
 
+## Variables
+
+Uses `group_vars` for group level variables such as `promtail_version` and `host_vars` for variables such as `service_name`
+
 ## Secrets
 
 This role uses ansible-vault to decrypt the secret value such as `loki_password` and from the root directory where the `inventory.ini` resides, you need to create the secret with:

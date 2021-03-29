@@ -14,8 +14,8 @@ Host jump-host
     IdentityFile ~/.ssh/id_rsa
 
 # SSH Targets
-Host promtail-host-1
-    HostName example-host.mydomain.com
+Host promtail-host-dev
+    HostName promtail-host-dev.mydomain.com
     User ubuntu
     IdentityFile ~/.ssh/target.pem
     ProxyJump jump-host

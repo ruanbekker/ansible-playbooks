@@ -56,7 +56,7 @@
 
 - name: generate config from template
   template:
-    src: promtail-config.yml.j2
+    src: "{{ service_name }}-promtail-config.yml.j2"
     dest: /etc/promtail/promtail-config.yml
     owner: root
     group: root

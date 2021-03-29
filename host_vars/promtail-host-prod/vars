@@ -1,0 +1,5 @@
+service_name: "nginx"
+environment_name: "prod"
+loki_hostname: "{{ vault_loki_hostname }}"
+loki_username: "{{ vault_loki_username }}"
+loki_password: "{{ vault_loki_password }}"

@@ -1,0 +1,97 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /var/lib/promtail/positions.yaml
+
+clients:
+  - url: https://{{ loki_username }}:{{ loki_password }}@{{ loki_hostname }}/loki/api/v1/push
+
+scrape_configs:
+  - job_name: {{ environment_name }}/{{ service_name }}-journal
+    journal:
+      max_age: 1h
+      path: /var/log/journal
+      labels:
+        job: {{ environment_name }}/{{ service_name }}-journal
+        environment: {{ environment_name }}
+        host: {{ service_name }}
+        team: engineering
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+  - job_name: {{ environment_name }}/{{ service_name }}-syslog
+    pipeline_stages:
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: {{ environment_name }}/{{ service_name }}-syslog
+        host: {{ service_name }}
+        environment: {{ environment_name }}
+        team: engineering
+        __path__: /var/log/syslog
+
+  - job_name: {{ environment_name }}/{{ service_name }}-info
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: {{ environment_name }}/{{ service_name }}
+        environment: {{ environment_name }}
+        host: {{ service_name }}
+        logtype: info
+        level: info
+        service: {{ service_name }}
+        team: engineering
+        __path__: /var/log/nginx/access.log
+    pipeline_stages:
+    - match:
+        selector: '{job="{{ environment_name }}/{{ service_name }}", logtype="info"}'
+        stages:
+        - regex:
+            expression: '.*(?P<hits>GET /.*)'
+        - metrics:
+            app_info_get_hits:
+              type: Counter
+              description: "Total app GET requests"
+              source: hits
+              config:
+                action: inc
+        - regex:
+            expression: '.*(?P<hits>POST /.*)'
+        - metrics:
+            app_info_post_hits:
+              type: Counter
+              description: "Total app POST requests"
+              source: hits
+              config:
+                action: inc
+
+  - job_name: {{ environment_name }}/{{ service_name }}
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: {{ environment_name }}/{{ service_name }}-error
+        environment: {{ environment_name }}
+        host: {{ service_name }}
+        level: error
+        logtype: error
+        service: {{ service_name }}
+        team: engineering
+        __path__: /var/log/nginx/error.log
+    pipeline_stages:
+    - match:
+        selector: '{job="{{ environment_name }}/{{ service_name }}", logtype="error"}'
+        stages:
+        - metrics:
+            app_error_events:
+              type: Counter
+              description: "Total error log events"
+              source: hits
+              config:
+                action: inc
+
