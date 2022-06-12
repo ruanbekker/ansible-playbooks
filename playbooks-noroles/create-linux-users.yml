@@ -1,0 +1,38 @@
+# ssh-keygen -f ruan -t rsa -C "ruan" -q -N ""
+---
+- name: "Playbook to create user and add key to servers"
+  hosts: all
+  become: true
+  tasks:
+  - name : "Create Groups"
+    group:
+      name: "{{item}}"
+      state: "present"
+    with_items:
+      - admins
+
+  - name: Allow 'admin' group to have passwordless sudo
+    lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: '^%admins'
+      line: '%admins ALL=(ALL) NOPASSWD: ALL'
+      validate: 'visudo -cf %s'
+
+  - name : "Create a user"
+    user:
+      name: "{{item.name}}"
+      shell: /bin/bash
+      create_home: yes
+      group: "{{item.group}}"
+      state: present
+    with_items:
+      - { name: 'ruan', group: 'admins'}
+
+  - name: "Copy the authorized key file from"
+    authorized_key:
+      user: "{{item.name}}"
+      state: "{{item.userstate}}"
+      key: "{{ lookup('file', '{{ item.key }}')}}"
+    with_items:
+      - { name: 'ruan', key: 'ruan.pub', userstate: 'present'}
