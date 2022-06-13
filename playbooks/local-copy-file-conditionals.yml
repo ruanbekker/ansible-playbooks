@@ -1,4 +1,6 @@
 ---
+# deploy:
+# ansible-playbook -l batman --tags=install --extra-vars app_path=/var/www/batman/releases/00000001 local-copy-file-conditionals.yml
 - name: copy-files-conditionals
   hosts: local
   roles:
