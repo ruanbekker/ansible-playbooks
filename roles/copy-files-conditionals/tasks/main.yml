@@ -1,0 +1,30 @@
+---
+- name: create key directory
+  file:
+    dest: "{{ app_path }}/certs"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: 0755
+  become: true
+  tags:
+    - install
+  when: requires_aws_rds_key
+
+- name: install key
+  copy:
+    src: global-bundle.pem
+    dest: "{{ app_path }}/certs/global-bundle.pem"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: 0600
+  become: true
+  tags:
+    - install
+  when: requires_key
+
+- name: run a command
+  command: touch file.txt chdir=/tmp
+  tags:
+    - install
+  when: app_name == "myapp"
