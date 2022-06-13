@@ -1,0 +1,7 @@
+---
+app_name: myapp
+app_root: /var/www/{{ app_name }}
+app_webroot: "{{ app_root }}/current"
+app_user: "www-data"
+app_path: "/var/www/{{ app_name }}"
+requires_key: false
