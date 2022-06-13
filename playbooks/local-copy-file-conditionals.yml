@@ -1,0 +1,5 @@
+---
+- name: copy-files-conditionals
+  hosts: local
+  roles:
+    - { role: ../roles/copy-files-conditionals }
